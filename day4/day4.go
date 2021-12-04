@@ -11,6 +11,8 @@ import (
 func main() {
 	draws := []int{}
 	cards := [][]int{}
+	completedCards := map[int]bool{}
+	p2 := true
 
 	content, err := ioutil.ReadFile("input.txt")
 	if err != nil {
@@ -28,15 +30,33 @@ func main() {
 	for i := 0; i < len(draws); i++ {
 		done := false
 		for j := 0; j < len(cards); j++ {
+			if p2 {
+				_, ok := completedCards[j]
+				if ok {
+					continue
+				}
+
+			}
+
 			index := markNumber(cards[j], draws[i])
 			if index == -1 {
 				continue
 			}
 			if checkIfBingo(cards[j], index) {
-				bingoCard = cards[j]
 				bingoDraw = draws[i]
-				done = true
-				break
+
+				if p2 == true {
+					completedCards[j] = true
+					if len(completedCards) == len(cards) {
+						bingoCard = cards[j]
+						done = true
+						break
+					}
+				} else {
+					bingoCard = cards[j]
+					done = true
+					break
+				}
 			}
 		}
 		if done {
@@ -112,13 +132,8 @@ func checkIfBingo(card []int, i int) bool {
 	row := []int{card[i], card[(i+1)%5+mult], card[(i+2)%5+mult], card[(i+3)%5+mult], card[(i+4)%5+mult]}
 	col := []int{card[i], card[(i+5)%25], card[(i+10)%25], card[(i+15)%25], card[(i+20)%25]}
 
-	bingo := checkSlice(row) || checkSlice(col)
+	return checkSlice(row) || checkSlice(col)
 
-	if bingo {
-		return true
-	}
-
-	return false
 }
 
 func checkSlice(slice []int) bool {
