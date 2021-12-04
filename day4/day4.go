@@ -107,7 +107,9 @@ func markNumber(card []int, no int) int {
 
 func checkIfBingo(card []int, i int) bool {
 
-	row := []int{card[i], card[(i+1)%25], card[(i+2)%25], card[(i+3)%25], card[(i+4)%25]}
+	mult := (i / 5) * 5
+
+	row := []int{card[i], card[(i+1)%5+mult], card[(i+2)%5+mult], card[(i+3)%5+mult], card[(i+4)%5+mult]}
 	col := []int{card[i], card[(i+5)%25], card[(i+10)%25], card[(i+15)%25], card[(i+20)%25]}
 
 	bingo := checkSlice(row) || checkSlice(col)
