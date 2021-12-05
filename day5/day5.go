@@ -10,12 +10,13 @@ import (
 func main() {
 
 	points := [][][]int{}
-	content, err := ioutil.ReadFile("test-input.txt")
+	content, err := ioutil.ReadFile("input.txt")
 	if err != nil {
 		panic(err)
 	}
+	//split lines
 	lines := strings.Split(string(content), "\r\n")
-
+	//convert lines to 3D array - (array of lines, each line containing 2 points, each point containing x and y coordinates)
 	for i := 0; i < len(lines); i++ {
 		p := strings.Split(lines[i], " -> ")
 
@@ -38,17 +39,18 @@ func calcP1(pointPairs [][][]int) {
 
 	for i := 0; i < len(pointPairs); i++ {
 		pair := pointPairs[i]
-
+		//if not horizontal/vertical, skip
 		dir := isHorOrVert(pair)
 		if dir == -1 {
 			continue
 		}
-
+		//mark the 2 points as covered
 		p1 := pointKey(pair[0])
 		p2 := pointKey(pair[1])
 		insertIntoPoints(coveredPoints, p1)
 		insertIntoPoints(coveredPoints, p2)
 
+		//get init and upto for looping
 		init, upto := sort2(pair[0][dir], pair[1][dir])
 		j := init + 1
 
@@ -63,24 +65,14 @@ func calcP1(pointPairs [][][]int) {
 				point = append(point, j)
 			}
 			key := pointKey(point)
-
 			insertIntoPoints(coveredPoints, key)
-
-			//this is prob for part 2 lmao
-			/*
-				if checkPointInLine(pair, point) {
-					if !ok {
-						coveredPoints[key] = 1
-					} else {
-						coveredPoints[key] += 1
-					}
-				}
-			*/
 
 			j++
 		}
 
 	}
+
+	//count twice-covered points
 	ct := 0
 	for _, val := range coveredPoints {
 		if val >= 2 {
@@ -110,14 +102,6 @@ func isHorOrVert(line [][]int) int {
 	} else {
 		return -1
 	}
-}
-
-// uses (x - x1)/(x1 - x2) = (y - y1)/(y1 - y2) equation to check whether point is in line
-func checkPointInLine(line [][]int, point []int) bool {
-	x := (point[0] - line[0][0]) / (line[0][0] - line[1][0])
-	y := (point[1] - line[0][1]) / (line[0][1] - line[1][1])
-
-	return x == y
 }
 
 //just converts string array to int array
