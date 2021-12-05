@@ -10,11 +10,15 @@ import (
 func main() {
 
 	points := [][][]int{}
+
+	//set true to get the answer for part 2!
+	part2 := false
+
 	content, err := ioutil.ReadFile("input.txt")
 	if err != nil {
 		panic(err)
 	}
-	//split lines
+
 	lines := strings.Split(string(content), "\r\n")
 	//convert lines to 3D array - (array of lines, each line containing 2 points, each point containing x and y coordinates)
 	for i := 0; i < len(lines); i++ {
@@ -29,47 +33,59 @@ func main() {
 
 	}
 
-	calcP1(points)
+	calcRes(points, part2)
 
 }
 
-//part 1
-func calcP1(pointPairs [][][]int) {
+func calcRes(pointPairs [][][]int, part2 bool) {
 	coveredPoints := map[string]int{}
 
 	for i := 0; i < len(pointPairs); i++ {
 		pair := pointPairs[i]
-		//if not horizontal/vertical, skip
+
+		//if not horizontal/vertical and part 1, skip
 		dir := isHorOrVert(pair)
-		if dir == -1 {
+		if dir == -1 && !part2 {
 			continue
 		}
-		//mark the 2 points as covered
-		p1 := pointKey(pair[0])
-		p2 := pointKey(pair[1])
+
+		//mark the 2 end points as covered
+		p1, p2 := pointKey(pair[0]), pointKey(pair[1])
 		insertIntoPoints(coveredPoints, p1)
 		insertIntoPoints(coveredPoints, p2)
 
-		//get init and upto for looping
-		init, upto := sort2(pair[0][dir], pair[1][dir])
-		j := init + 1
+		if !part2 || (part2 && dir != -1) {
+			init, upto := sort2(pair[0][dir], pair[1][dir])
+			j := init + 1
 
-		for j < upto {
+			for j < upto {
 
-			point := []int{}
-			if dir == 0 {
-				point = append(point, j)
-				point = append(point, pair[0][1])
-			} else {
-				point = append(point, pair[0][0])
-				point = append(point, j)
+				point := []int{}
+				if dir == 0 {
+					point = append(point, j)
+					point = append(point, pair[0][1])
+				} else {
+					point = append(point, pair[0][0])
+					point = append(point, j)
+				}
+				key := pointKey(point)
+				insertIntoPoints(coveredPoints, key)
+
+				j++
 			}
-			key := pointKey(point)
-			insertIntoPoints(coveredPoints, key)
+		} else {
+			x1, x2 := sort2(pair[0][0], pair[1][0])
+			y1, y2 := sort2(pair[0][1], pair[1][1])
 
-			j++
+			for i := x1 + 1; i < x2; i++ {
+				for j := y1 + 1; j < y2; j++ {
+					if checkPointInLine(pair, []int{i, j}) {
+						key := pointKey([]int{i, j})
+						insertIntoPoints(coveredPoints, key)
+					}
+				}
+			}
 		}
-
 	}
 
 	//count twice-covered points
@@ -93,7 +109,7 @@ func insertIntoPoints(Map map[string]int, key string) {
 
 //if its a horizontal line(ie y coords have to be checked), return 1(index of y co-ordinate for each point)
 //if its a vertical line(ie x coords have to be checked), return 0(index of y co-ordinate for each point)
-//else return -1
+//else return -1 (ie diagonals for part 2)
 func isHorOrVert(line [][]int) int {
 	if line[0][0] == line[1][0] {
 		return 1
@@ -108,8 +124,8 @@ func isHorOrVert(line [][]int) int {
 func strToInt(arr []string) []int {
 	a := []int{}
 
-	for i := 0; i < len(arr); i++ {
-		I, err := strconv.Atoi(arr[i])
+	for _, val := range arr {
+		I, err := strconv.Atoi(val)
 		if err != nil {
 			panic(err)
 		}
@@ -130,6 +146,15 @@ func sort2(a int, b int) (int, int) {
 	} else {
 		return b, a
 	}
+}
+
+//checks whether a point is in a line using the (x-x1)/(x1-x2) = (y-y1)/(y1-y2) equation
+func checkPointInLine(line [][]int, point []int) bool {
+	var x, y float32
+	x = (float32(point[0]) - float32(line[0][0])) / (float32(line[0][0]) - float32(line[1][0]))
+	y = (float32(point[1]) - float32(line[0][1])) / (float32(line[0][1]) - float32(line[1][1]))
+
+	return x == y
 }
 
 //for unused variables lol
