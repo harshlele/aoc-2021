@@ -14,9 +14,9 @@ func main() {
 	}
 
 	lines := strings.Split(string(content), "\r\n")
-	//fmt.Println(calcP1(lines))
-	calcP2(lines)
 
+	fmt.Println(calcP1(lines))
+	fmt.Println(calcP2(lines))
 }
 
 func calcP1(lines []string) int {
@@ -39,28 +39,31 @@ func calcP1(lines []string) int {
 	return sum
 }
 
-func calcP2(lines []string) {
-	wordArr := [][]string{}
+func calcP2(lines []string) int {
+	inArr := [][]string{}
+	oArr := [][]string{}
 
 	for _, line := range lines {
 		output := strings.Replace(line, " | ", " ", -1)
 		words := strings.Split(output, " ")
-		wordArr = append(wordArr, words)
+		inArr = append(inArr, words[:10])
+		oArr = append(oArr, words[10:])
 	}
 
 	overall := 0
 
-	for _, wArr := range wordArr {
+	for i, wArr := range inArr {
 		wMap := mapLetters(wArr)
+		out := oArr[i]
 
 		sum := 0
-		for i := 10; i < 14; i++ {
-			sum = (sum * 10) + getNumFromMap(wMap, wArr[i])
+		for j := 0; j < 4; j++ {
+			sum = (sum * 10) + getNumFromMap(wMap, out[j])
 		}
 		overall += sum
 	}
 
-	fmt.Println(overall)
+	return overall
 
 }
 
@@ -90,9 +93,8 @@ func getInitSegMap() [7]map[string]bool {
 func mapLetters(words []string) [7]string {
 	initSeg := getInitSegMap()
 
-	completedMap := [7]string{"", "", "", "", "", "", ""}
+	completedMap := [7]string{}
 
-	//first pass
 	for _, w := range words {
 		letters := strings.Split(w, "")
 
@@ -146,6 +148,11 @@ func mapLetters(words []string) [7]string {
 			}
 		}
 
+		//turns out we need only the 2nd and 4th segment letters to get numbers from words, so just get out of this thing lol
+		if len(initSeg[2]) == 1 && len(initSeg[4]) == 1 {
+			return completedMap
+		}
+
 	}
 
 	//use the completed maps(ie those with length 1) to remove duplicates from incomplete ones
@@ -189,12 +196,12 @@ func getNumFromMap(lMap [7]string, word string) int {
 			return 3
 		}
 	} else {
-		if !strings.Contains(word, lMap[3]) {
-			return 0
-		} else if strings.Contains(word, lMap[4]) {
+		if !strings.Contains(word, lMap[4]) {
+			return 9
+		} else if !strings.Contains(word, lMap[2]) {
 			return 6
 		} else {
-			return 9
+			return 0
 		}
 	}
 }
