@@ -33,7 +33,7 @@ func main() {
 	calcP2(nos, lows)
 }
 
-//depth-first traversal starting from the low point, basically
+//depth-first traversal starting from the low point
 func calcP2(nos [][]int, lows []Basin) {
 	sizes := []int{}
 	for _, val := range lows {
