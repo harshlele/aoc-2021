@@ -5,19 +5,19 @@ import (
 	"io/ioutil"
 	"math"
 	"sort"
-	"strconv"
 	"strings"
+	"aoc-2021/aoc-utils"
 )
 
 func main() {
 
-	content, err := ioutil.ReadFile("input.txt")
+	content, err := ioutil.ReadFile("day7/input.txt")
 	if err != nil {
 		panic(err)
 	}
 
 	s := strings.Split(string(strings.Trim(string(content), "\n")), ",")
-	nos := strToInt(s)
+	nos := utils.StrToInt(s)
 
 	minDist, max := calcP1(nos)
 	fmt.Println(minDist)
@@ -84,19 +84,3 @@ func findDistP2(arr []int, val int, currMin int) int {
 	return sum
 }
 
-func strToInt(arr []string) []int {
-	a := []int{}
-
-	for _, val := range arr {
-		I, err := strconv.Atoi(val)
-		if err != nil {
-			panic(err)
-		}
-		a = append(a, I)
-	}
-
-	return a
-}
-
-//for unused variables lol
-func x(X ...interface{}) {}

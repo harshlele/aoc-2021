@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"sort"
-	"strconv"
 	"strings"
+	"aoc-2021/aoc-utils"
 )
 
 type Basin struct {
@@ -14,7 +14,7 @@ type Basin struct {
 }
 
 func main() {
-	content, err := ioutil.ReadFile("input.txt")
+	content, err := ioutil.ReadFile("day9/input.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -24,7 +24,7 @@ func main() {
 	nos := [][]int{}
 
 	for _, val := range lines {
-		numLine := strToInt(strings.Split(val, ""))
+		numLine := utils.StrToInt(strings.Split(val, ""))
 		nos = append(nos, numLine)
 	}
 
@@ -56,12 +56,12 @@ func dfsCount(nos [][]int, point []int, points map[string]bool) int {
 		return 0
 	}
 
-	_, ok := points[pointKey(point)]
+	_, ok := points[utils.PointKey(point)]
 	//if the point has already been traversed, skip it
 	if ok {
 		return 0
 	} else {
-		points[pointKey(point)] = true
+		points[utils.PointKey(point)] = true
 		l, r, t, b := []int{i, j - 1}, []int{i, j + 1}, []int{i - 1, j}, []int{i + 1, j}
 
 		//apparently it produces the right answer without checking if adjacent numbers are actually greater
@@ -126,22 +126,4 @@ func calcP1(nos [][]int) []Basin {
 	}
 	fmt.Println(mins)
 	return lows
-}
-
-func strToInt(arr []string) []int {
-	a := []int{}
-
-	for _, val := range arr {
-		I, err := strconv.Atoi(val)
-		if err != nil {
-			panic(err)
-		}
-		a = append(a, I)
-	}
-
-	return a
-}
-
-func pointKey(point []int) string {
-	return fmt.Sprintf("%d,%d", point[0], point[1])
 }

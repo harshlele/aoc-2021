@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"strconv"
 	"strings"
+	"aoc-2021/aoc-utils"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	//set true to get the answer for part 2!
 	part2 := false
 
-	content, err := ioutil.ReadFile("input.txt")
+	content, err := ioutil.ReadFile("day5/test-input.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -24,8 +24,8 @@ func main() {
 	for i := 0; i < len(lines); i++ {
 		p := strings.Split(lines[i], " -> ")
 
-		c1 := strToInt(strings.Split(p[0], ","))
-		c2 := strToInt(strings.Split(p[1], ","))
+		c1 := utils.StrToInt(strings.Split(p[0], ","))
+		c2 := utils.StrToInt(strings.Split(p[1], ","))
 		pair := [][]int{}
 		pair = append(pair, c1)
 		pair = append(pair, c2)
@@ -50,12 +50,12 @@ func calcRes(pointPairs [][][]int, part2 bool) {
 		}
 
 		//mark the 2 end points as covered
-		p1, p2 := pointKey(pair[0]), pointKey(pair[1])
+		p1, p2 := utils.PointKey(pair[0]), utils.PointKey(pair[1])
 		insertIntoPoints(coveredPoints, p1)
 		insertIntoPoints(coveredPoints, p2)
 
 		if !part2 || (part2 && dir != -1) {
-			init, upto := sort2(pair[0][dir], pair[1][dir])
+			init, upto := utils.Sort2(pair[0][dir], pair[1][dir])
 			j := init + 1
 
 			for j < upto {
@@ -68,19 +68,19 @@ func calcRes(pointPairs [][][]int, part2 bool) {
 					point = append(point, pair[0][0])
 					point = append(point, j)
 				}
-				key := pointKey(point)
+				key := utils.PointKey(point)
 				insertIntoPoints(coveredPoints, key)
 
 				j++
 			}
 		} else {
-			x1, x2 := sort2(pair[0][0], pair[1][0])
-			y1, y2 := sort2(pair[0][1], pair[1][1])
+			x1, x2 := utils.Sort2(pair[0][0], pair[1][0])
+			y1, y2 := utils.Sort2(pair[0][1], pair[1][1])
 
 			for i := x1 + 1; i < x2; i++ {
 				for j := y1 + 1; j < y2; j++ {
 					if checkPointInLine(pair, []int{i, j}) {
-						key := pointKey([]int{i, j})
+						key := utils.PointKey([]int{i, j})
 						insertIntoPoints(coveredPoints, key)
 					}
 				}
@@ -120,33 +120,7 @@ func isHorOrVert(line [][]int) int {
 	}
 }
 
-//just converts string array to int array
-func strToInt(arr []string) []int {
-	a := []int{}
 
-	for _, val := range arr {
-		I, err := strconv.Atoi(val)
-		if err != nil {
-			panic(err)
-		}
-		a = append(a, I)
-	}
-
-	return a
-}
-
-func pointKey(point []int) string {
-	return fmt.Sprintf("%d,%d", point[0], point[1])
-}
-
-//returns sorted order
-func sort2(a int, b int) (int, int) {
-	if a < b {
-		return a, b
-	} else {
-		return b, a
-	}
-}
 
 //checks whether a point is in a line using the (x-x1)/(x1-x2) = (y-y1)/(y1-y2) equation
 func checkPointInLine(line [][]int, point []int) bool {
@@ -157,5 +131,3 @@ func checkPointInLine(line [][]int, point []int) bool {
 	return x == y
 }
 
-//for unused variables lol
-func x(X ...interface{}) {}

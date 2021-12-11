@@ -3,23 +3,23 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"strconv"
 	"strings"
+	"aoc-2021/aoc-utils"
 )
 
 func main() {
 
-	content, err := ioutil.ReadFile("input.txt")
+	content, err := ioutil.ReadFile("day6/input.txt")
 	if err != nil {
 		panic(err)
 	}
 
 	s := strings.Split(string(strings.Trim(string(content), "\n")), ",")
 
-	nos := strToInt(s)
+	nos := utils.StrToInt(s)
 
 	days := 256
-	x(days)
+	utils.X(days)
 	calcP2(nos, days)
 }
 
@@ -105,21 +105,3 @@ func getFishForDays(fish int, days int, dayMap map[string]int) int {
 		}
 	}
 }
-
-//just converts string array to int array
-func strToInt(arr []string) []int {
-	a := []int{}
-
-	for _, val := range arr {
-		I, err := strconv.Atoi(val)
-		if err != nil {
-			panic(err)
-		}
-		a = append(a, I)
-	}
-
-	return a
-}
-
-//for unused variables lol
-func x(X ...interface{}) {}

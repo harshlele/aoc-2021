@@ -14,7 +14,7 @@ func main() {
 	completedCards := map[int]bool{}
 	p2 := true
 
-	content, err := ioutil.ReadFile("input.txt")
+	content, err := ioutil.ReadFile("day4/test-input.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -119,8 +119,6 @@ func calcResult(card []int, draw int) int {
 	return sum * draw
 }
 
-//for unused variables lol
-func x(X ...interface{}) {}
 
 func markNumber(card []int, no int) int {
 

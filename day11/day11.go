@@ -1,15 +1,15 @@
 package main
 
 import (
+	"aoc-2021/aoc-utils"
 	"fmt"
 	"io/ioutil"
-	"strconv"
 	"strings"
 )
 
 func main() {
 
-	content, err := ioutil.ReadFile("input.txt")
+	content, err := ioutil.ReadFile("day11/input.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -19,9 +19,8 @@ func main() {
 	lines := strings.Split(string(content), "\r\n")
 	for _, l := range lines {
 		nums := strings.Split(l, "")
-		octo = append(octo, strToInt(nums))
+		octo = append(octo, utils.StrToInt(nums))
 	}
-
 	calc(octo, 100, false)
 }
 
@@ -38,7 +37,7 @@ func calc(arr [][]int, steps int, part2 bool) {
 
 		//have to manually set flashed indexes to 0 for some reason...
 		for k := range flashMap {
-			sp := strToInt(strings.Split(k, ","))
+			sp := utils.StrToInt(strings.Split(k, ","))
 			arr[sp[0]][sp[1]] = 0
 		}
 		//for part 2, just check the step at which every octopus flashes all at once
@@ -57,9 +56,9 @@ func checkFlash(arr [][]int, i, j int, flashes map[string]bool) {
 	}
 	arr[i][j] += 1
 	if arr[i][j] > 9 {
-		_, ok := flashes[pointKey([]int{i, j})]
+		_, ok := flashes[utils.PointKey([]int{i, j})]
 		if !ok {
-			flashes[pointKey([]int{i, j})] = true
+			flashes[utils.PointKey([]int{i, j})] = true
 			//increment adjacent indexes
 			checkFlash(arr, i-1, j-1, flashes)
 			checkFlash(arr, i-1, j, flashes)
@@ -75,23 +74,4 @@ func checkFlash(arr [][]int, i, j int, flashes map[string]bool) {
 		}
 
 	}
-}
-
-//just converts string array to int array
-func strToInt(arr []string) []int {
-	a := []int{}
-
-	for _, val := range arr {
-		I, err := strconv.Atoi(val)
-		if err != nil {
-			panic(err)
-		}
-		a = append(a, I)
-	}
-
-	return a
-}
-
-func pointKey(point []int) string {
-	return fmt.Sprintf("%d,%d", point[0], point[1])
 }
