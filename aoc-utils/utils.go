@@ -20,10 +20,17 @@ func StrToInt(arr []string) []int {
 	return a
 }
 
+func ToInt(a string) int {
+	I, err := strconv.Atoi(a)
+	if err != nil {
+		panic(err)
+	}
+	return I
+}
+
 func PointKey(point []int) string {
 	return fmt.Sprintf("%d,%d", point[0], point[1])
 }
-
 
 //for unused variables lol
 func X(x ...interface{}) {}
