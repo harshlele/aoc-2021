@@ -1,6 +1,7 @@
 package main
 
 import (
+	utils "aoc-2021/aoc-utils"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -39,37 +40,29 @@ func main() {
 		edges = append(edges, e)
 	}
 
-	//for counting paths
-	ct := 0
-	p := &ct
+	twiceVisited := false
+	utils.X(twiceVisited)
+	fmt.Println(calcRes(graph, "start", []string{}))
 
-	//for counting the exceptional small cave
-	ec := 0
-	p2 := &ct
-
-	calcRes(graph, "start", map[string]int{}, []string{}, &p, &p2, "b")
-	fmt.Println(ct)
-	fmt.Println(ec)
 }
 
-func calcRes(graph map[string][]string, node string, visited map[string]int, stack []string, counter **int, exceptionalCt **int, except string) {
+func calcRes(graph map[string][]string, node string, stack []string) int {
 
-	visited[node] = 1
+	if node == "end" {
+		return 1
+	}
+	sum := 0
 	stack = append(stack, node)
-	//fmt.Println(stack)
-
-	pt := *counter
 
 	for _, n := range graph[node] {
-		_, ok := visited[n]
-		if (!ok || n != strings.ToLower(n)) && node != "end" {
-
-			calcRes(graph, n, visited, stack, counter, exceptionalCt, except)
-		}
-		if n == "end" {
-			(*pt) += 1
+		if n != strings.ToLower(n) {
+			sum += calcRes(graph, n, stack)
+		} else {
+			if utils.CountInArr(stack, n) == 0 {
+				sum += calcRes(graph, n, stack)
+			}
 		}
 	}
 	stack = stack[:len(stack)-1]
-	delete(visited, node)
+	return sum
 }

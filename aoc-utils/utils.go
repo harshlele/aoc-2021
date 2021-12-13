@@ -43,3 +43,13 @@ func Sort2(a int, b int) (int, int) {
 		return b, a
 	}
 }
+
+func CountInArr(arr []string, str string) int {
+	ct := 0
+	for _, val := range arr {
+		if val == str {
+			ct++
+		}
+	}
+	return ct
+}
