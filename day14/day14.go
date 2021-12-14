@@ -1,7 +1,6 @@
 package main
 
 import (
-	utils "aoc-2021/aoc-utils"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -19,65 +18,101 @@ func main() {
 	exp := re.MustCompile("\\r\\n\\r\\n")
 
 	inputs := exp.Split(string(content), -1)
-	template := []byte(inputs[0])
+	template := inputs[0]
 	lines := strings.Split(inputs[1], "\r\n")
 	rules := map[string]string{}
+	//make a rules map
 	for _, l := range lines {
 		k := strings.Split(l, " -> ")
 		rules[k[0]] = k[1]
 	}
 
-	//fmt.Println(template)
-	//fmt.Println(rules)
+	//initMap contains the number of occurences of letter pairs
+	//in the original template string (NN, NC, CB in the test input)
+	initMap := map[string]int64{}
+	countMap := map[string]int64{}
+	for i := 0; i < len(template); i++ {
+		if i < len(template)-1 {
+			//if a pair is in the rules, store its count in initMap
+			_, ok := rules[template[i:i+2]]
+			if ok {
+				_, o2 := initMap[template[i:i+2]]
+				if !o2 {
+					initMap[template[i:i+2]] = 1
+				} else {
+					initMap[template[i:i+2]] += 1
+				}
 
-	calcP1(template, rules, 10)
+			}
+		}
+
+		_, o2 := countMap[string(template[i])]
+		if !o2 {
+			countMap[string(template[i])] = 1
+		} else {
+			countMap[string(template[i])] += 1
+		}
+	}
+
+	calcPoly(initMap, rules, countMap, 40)
+
 }
 
-func calcP1(bArr []byte, rules map[string]string, steps int) {
-	count := map[byte]int{}
-	max := 0
-	for _, b := range bArr {
-		_, ok := count[b]
-		if !ok {
-			count[b] = 1
-		} else {
-			count[b] += 1
-			if count[b] > max {
-				max = count[b]
-			}
-		}
-	}
+func calcPoly(initMap map[string]int64, rules map[string]string, counts map[string]int64, steps int) {
 
 	for i := 0; i < steps; i++ {
-		j := 0
-		for j < len(bArr) {
-			val, ok := rules[string(bArr[j:j+2])]
-			if ok {
-				bArr = utils.InsertAtBArr(bArr, j+1, []byte(val))
+		//new map for every step
+		newMap := map[string]int64{}
+		for k := range initMap {
+			//check if pair is in initMap
+			v, o1 := rules[k]
+			if o1 {
+				//get the letter to insert, and store the occurences of the 2 new pairs that will be generated
+				//eg NN -> C (ie NCN after inserting C)
+				//so store the count of NC and CN in newMap
+				l := strings.Split(k, "")
+				k1, k2 := l[0]+v, v+l[1]
 
-				b := []byte(val)[0]
-				c, ok := count[b]
-				if !ok {
-					count[b] = 1
+				_, o2 := newMap[k1]
+				if !o2 {
+					newMap[k1] = initMap[k]
 				} else {
-					count[b] = c + 1
-					if count[b] > max {
-						max = count[b]
-					}
+					newMap[k1] += initMap[k]
 				}
-				j += 2
-			} else {
-				j += 1
+
+				_, o3 := newMap[k2]
+				if !o3 {
+					newMap[k2] = initMap[k]
+				} else {
+					newMap[k2] += initMap[k]
+				}
+
+				//update counts
+				_, o4 := counts[v]
+				if !o4 {
+					counts[v] = initMap[k]
+				} else {
+					counts[v] += initMap[k]
+				}
 			}
 		}
+		//replace old map with new one
+		initMap = newMap
 	}
 
-	//fmt.Println(bArr)
-	min := math.MaxInt
-	for k := range count {
-		if min > count[k] {
-			min = count[k]
+	//get the max and min used letters, and calc answer
+	var max, min int64
+	max = 0
+	min = math.MaxInt64
+
+	for k := range counts {
+		if max < counts[k] {
+			max = counts[k]
+		}
+		if min > counts[k] {
+			min = counts[k]
 		}
 	}
-	fmt.Println(max - min)
+
+	fmt.Println("diff using counts", max-min)
 }
