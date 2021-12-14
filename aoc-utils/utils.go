@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 )
@@ -8,15 +9,9 @@ import (
 //just converts string array to int array
 func StrToInt(arr []string) []int {
 	a := []int{}
-
 	for _, val := range arr {
-		I, err := strconv.Atoi(val)
-		if err != nil {
-			panic(err)
-		}
-		a = append(a, I)
+		a = append(a, ToInt(val))
 	}
-
 	return a
 }
 
@@ -28,6 +23,7 @@ func ToInt(a string) int {
 	return I
 }
 
+//just a simple string derived from 2 ints to use as a key in maps etc
 func PointKey(point []int) string {
 	return fmt.Sprintf("%d,%d", point[0], point[1])
 }
@@ -52,4 +48,15 @@ func CountInArr(arr []string, str string) int {
 		}
 	}
 	return ct
+}
+
+//insert bytes in byte array
+func InsertAtBArr(arr []byte, position int, newBytes []byte) []byte {
+
+	newArr := bytes.Buffer{}
+	newArr.Write(arr[:position])
+	newArr.Write(newBytes)
+	newArr.Write(arr[position:])
+
+	return newArr.Bytes()
 }
