@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -14,33 +15,43 @@ func main() {
 		panic(err)
 	}
 
-	vQ := PriorityQ{map[string][]int{}, ""}
-	uQ := PriorityQ{map[string][]int{}, ""}
+	vQ := PriorityQ{make(map[string][]int, 250100), ""}
+	uQ := PriorityQ{make(map[string][]int, 250100), ""}
 
 	lines := strings.Split(string(content), "\r\n")
 
 	for i, l := range lines {
 		ints := utils.StrToInt(strings.Split(l, ""))
 		for j, I := range ints {
-			if i == 0 && j == 0 {
-				uQ.Push(i, j, []int{I, 0})
-			} else {
-				uQ.Push(i, j, []int{I, 100000})
+
+			for k := 0; k < 5; k++ {
+				for m := 0; m < 5; m++ {
+					dist := 100000
+					if i == 0 && j == 0 && k == 0 && m == 0 {
+						dist = 0
+					}
+					val := I + k + m
+					if val > 9 {
+						val -= 9
+					}
+
+					uQ.Push(i+(k*100), j+(m*100), []int{val, dist})
+
+				}
 			}
 
 		}
+
 	}
 
 	getShortestPath2(vQ, uQ)
 
-	//set og cost to 0
-	//getShortestPath(rMap, visited, 0, 0)
 }
 
 func getShortestPath2(vQ, uQ PriorityQ) {
 
 	isValid := func(i, j int) bool {
-		if i < 0 || i >= 100 || j < 0 || j >= 100 {
+		if i < 0 || i >= 500 || j < 0 || j >= 500 {
 			return false
 		}
 		return true
@@ -71,6 +82,7 @@ func getShortestPath2(vQ, uQ PriorityQ) {
 
 	initL := len(uQ.Map)
 	fmt.Println(initL)
+	t := time.Now()
 	for true {
 		min := utils.StrToInt(strings.Split(uQ.min, ","))
 
@@ -85,32 +97,11 @@ func getShortestPath2(vQ, uQ PriorityQ) {
 		updateDist(r0, r1, val)
 
 		if len(vQ.Map) == initL {
-			fmt.Println(vQ.Map["99,99"])
+			fmt.Println(vQ.Map["499,499"])
 			break
+		} else if len(vQ.Map)%1000 == 0 {
+			fmt.Println(len(vQ.Map), "visited, ", time.Since(t), "since last update")
+			t = time.Now()
 		}
 	}
-}
-
-func getShortestPath(graph [][][]int, visitedPaths map[string]bool, i, j int) {
-
-	visitedPaths[utils.PointKey([]int{i, j})] = true
-
-	updateAndTraverse := func(pX, pY int) {
-
-		curr := graph[i][j]
-		adj := graph[pX][pY]
-
-		if adj[1] > curr[1]+adj[0] {
-			graph[pX][pY][1] = curr[1] + adj[0]
-		}
-
-	}
-
-	u0, u1, d0, d1, l0, l1, r0, r1 := i-1, j, i+1, j, i, j-1, i, j+1
-
-	updateAndTraverse(u0, u1)
-	updateAndTraverse(d0, d1)
-	updateAndTraverse(l0, l1)
-	updateAndTraverse(r0, r1)
-
 }

@@ -4,6 +4,8 @@ import (
 	utils "aoc-2021/aoc-utils"
 )
 
+//WARNING - NEVER USE FOR LARGE QUEUES(ie part 2 lmao)
+//with this, part 2 takes 1.5-2 hours to complete
 type PriorityQ struct {
 	Map map[string][]int
 	min string
@@ -40,11 +42,15 @@ func (q *PriorityQ) Remove(i, j int) []int {
 func (q *PriorityQ) UpdateAtKey(i, j int, newVal []int) {
 	key := utils.PointKey([]int{i, j})
 	if q.isInMap(key) {
+		old := q.Map[key]
 		q.Map[key] = newVal
+		if key == q.min {
+			if old[1] <= newVal[1] {
+				q.updateMin()
+			}
+		}
 	}
-	if key == q.min {
-		q.updateMin()
-	}
+
 }
 
 func (q *PriorityQ) updateMin() {
