@@ -1,4 +1,4 @@
-package main
+/*package main
 
 import (
 	utils "aoc-2021/aoc-utils"
@@ -13,7 +13,6 @@ type Node struct {
 	right  *Node
 	order  [2]string
 	parent *Node
-	root   *Node
 	height int
 }
 
@@ -29,14 +28,57 @@ func main() {
 
 			for _, line := range lines {
 			}
-	*/
-	n := parseLine("[[[[1,3],[5,3]],[[1,3],[8,7]]],[[[4,9],[6,9]],[[8,2],[7,3]]]]")
 
-	utils.X(n)
+	n := parseLine("[[[[4,3],4],4],[7,[[8,4],9]]]")
+	b := parseLine("[1,1]")
+
+	newR := addNodes(n, b)
+
+	utils.X(newR)
+}
+
+func addNodes(a, b Node) Node {
+	newRoot := initNode()
+
+	newRoot.left = &a
+	newRoot.right = &b
+
+	newRoot.left.parent = &newRoot
+	newRoot.right.parent = &newRoot
+	updateHeights(&newRoot)
+
+	reduce(&newRoot)
+
+	return newRoot
+}
+
+func reduce(node *Node) {
+	if node.height < 4 {
+		if node.left != nil {
+			reduce(node.left)
+		}
+		if node.right != nil {
+			reduce(node.right)
+		}
+	} else {
+
+	}
+}
+
+func updateHeights(node *Node) {
+
+	if node.left != nil {
+		node.left.height = node.height + 1
+		updateHeights(node.left)
+	}
+	if node.right != nil {
+		node.right.height = node.height + 1
+		updateHeights(node.right)
+	}
 }
 
 func initNode() Node {
-	return Node{rand.Intn(100), [2]int{-1, -1}, nil, nil, [2]string{"", ""}, nil, nil, 0}
+	return Node{rand.Intn(100), [2]int{-1, -1}, nil, nil, [2]string{"", ""}, nil, 0}
 }
 
 func parseLine(line string) Node {
@@ -50,7 +92,6 @@ func parseLine(line string) Node {
 			//n := Node{[2]int{-1, -1}, []Node{}, curr, curr.height + 1, &root, rand.Intn(100)}
 			n := initNode()
 			n.parent = curr
-			n.root = &root
 			n.height = curr.height + 1
 
 			if curr.left == nil {
@@ -110,3 +151,4 @@ func parseLine(line string) Node {
 
 	return root
 }
+*/
