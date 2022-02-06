@@ -3,10 +3,11 @@ const txt = fs.readFileSync("day18/input.txt");
 
 const lines = txt.toString().split("\r\n");
 
+const p1 = false
 
 const initNode = () => ({
   //for smaller multiples for eg 1000 or even 10000, 
-  //it can produce 2 different answers in 2 different runs lmao
+  //it can produce 2 different answers in 2 different runs for part 1 lmao
   //prob a better idea to use something like uuid i guess....
   id: parseInt(Math.random() * 10000000),       
   num: false,
@@ -297,33 +298,90 @@ function magnitude(root){
   return totalSum;
 }
 
+//part 1
+if(p1) {
+  //read first input
+  let acc = readInLine(lines[0]);
 
-//read first input
-let acc = readInLine(lines[0]);
+  for (let i = 1; i < lines.length; i++) {
+    //read next line
+    let curr = readInLine(lines[i]);
 
-for (let i = 1; i < lines.length; i++) {
-  //read next line
-  let curr = readInLine(lines[i]);
+    //create new parent and append the accumulator and current tree to it
+    let newRoot = initNode();
+    newRoot.left = acc;
+    newRoot.right = curr;
+    acc.parent = newRoot;
+    curr.parent = newRoot;
+    //set new parent
+    acc = newRoot;
+    acc.parent = null;
 
-  //create new parent and append the accumulator and current tree to it
-  let newRoot = initNode();
-  newRoot.left = acc;
-  newRoot.right = curr;
-  acc.parent = newRoot;
-  curr.parent = newRoot;
-  //set new parent
-  acc = newRoot;
-  acc.parent = null;
+    reduce(acc, acc);
 
-  reduce(acc, acc);
+  }
+
+  console.log("-------------------------------------------------------");
+  console.log("final answer - ", printTree(acc).join(""));
+  console.log("magnitude - ", magnitude(acc));
 
 }
+//part 2
+else {
+  const nCom = {}
+  let maxSum = 0;
+  //just add each combination of nos twice(i + j, j + i) and get max magnitude
+  for (i = 0; i < lines.length; i++) {
+    for (j = 0; j < lines.length; j++) {
+      if(i == j) continue;
 
+      let n1, n2, acc, sum;
 
+      if(!nCom[`${i}.${j}`]) {
+        n1 = readInLine(lines[i]);
+        n2 = readInLine(lines[j]);
+  
+        acc = initNode();
+        acc.left = n1;
+        acc.right = n2;
+        n1.parent = acc;
+        n2.parent = acc;
+        acc.parent = null;
+  
+        reduce(acc);
+        sum = magnitude(acc);
+        if(sum > maxSum) {
+          maxSum = sum;
+        }  
 
-console.log("-------------------------------------------------------");
-console.log("final answer - ", printTree(acc).join(""));
-console.log("magnitude - ", magnitude(acc));
+        nCom[`${i}.${j}`] = true;
+      }
 
+      if(!nCom[`${j}.${i}`]) {
+        n1 = readInLine(lines[j]);
+        n2 = readInLine(lines[i]);
+  
+        acc = initNode();
+        acc.left = n1;
+        acc.right = n2;
+        n1.parent = acc;
+        n2.parent = acc;
+        acc.parent = null;
+  
+        reduce(acc);
+        sum = magnitude(acc);
+        if(sum > maxSum) {
+          maxSum = sum;
+        }
+        
+        nCom[`${j}.${i}`] = true;
+      }
+
+    }
+  }
+
+  console.log("maxSum", maxSum);
+
+}
 
 
