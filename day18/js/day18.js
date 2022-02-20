@@ -1,9 +1,19 @@
 const fs = require("fs");
-const txt = fs.readFileSync("day18/input.txt");
+const txt = fs.readFileSync("day18/test-input.txt");
+const process = require("process");
 
-const lines = txt.toString().split("\r\n");
+let lines;
 
-const p1 = false
+if(process.platform === "win32") {
+  lines = txt.toString().split("\r\n");
+}
+else {
+  lines = txt.toString().split("\n");
+}
+
+
+
+const p1 = true
 
 const initNode = () => ({
   //for smaller multiples for eg 1000 or even 10000, 
